@@ -1,0 +1,133 @@
+:root {
+  --primary: #4f6ef7;
+  --primary-hover: #3d5ce0;
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ---------- 登录/注册页 ---------- */
+.auth-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+.auth-card {
+  width: 360px;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+}
+.auth-card h1 { font-size: 22px; text-align: center; margin-bottom: 4px; }
+.auth-card .subtitle { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+.auth-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.auth-tabs button {
+  flex: 1; padding: 10px; border: none; background: none; cursor: pointer;
+  font-size: 14px; color: var(--muted); border-bottom: 2px solid transparent;
+}
+.auth-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.form-group input, .form-group select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: 14px; outline: none;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+.btn {
+  width: 100%; padding: 10px; border: none; border-radius: 8px; cursor: pointer;
+  font-size: 14px; font-weight: 600; transition: background 0.15s;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); }
+.error-msg { color: var(--danger); font-size: 13px; min-height: 18px; margin-top: 10px; text-align: center; }
+
+/* ---------- 主页面 ---------- */
+.topbar {
+  background: var(--card); border-bottom: 1px solid var(--border);
+  padding: 14px 32px; display: flex; align-items: center; justify-content: space-between;
+}
+.topbar .brand { font-size: 18px; font-weight: 700; color: var(--primary); }
+.topbar .user-area { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.topbar .logout-btn {
+  padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px;
+  background: none; cursor: pointer; font-size: 13px; color: var(--muted);
+}
+.topbar .logout-btn:hover { color: var(--danger); border-color: var(--danger); }
+
+.container { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+
+.stats-bar {
+  display: flex; gap: 12px; margin-bottom: 20px;
+}
+.stat-card {
+  flex: 1; background: var(--card); border-radius: 10px; padding: 14px 16px;
+  border: 1px solid var(--border); text-align: center;
+}
+.stat-card .num { font-size: 22px; font-weight: 700; }
+.stat-card .label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.panel h2 { font-size: 15px; margin-bottom: 14px; }
+.add-form { display: flex; gap: 10px; flex-wrap: wrap; }
+.add-form input, .add-form select {
+  padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none;
+}
+.add-form input:focus, .add-form select:focus { border-color: var(--primary); }
+.add-form .title-input { flex: 2; min-width: 200px; }
+.add-form .btn { width: auto; padding: 9px 20px; }
+
+.filter-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.filter-tabs button {
+  padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border);
+  background: none; cursor: pointer; font-size: 13px; color: var(--muted);
+}
+.filter-tabs button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.task-list { display: flex; flex-direction: column; gap: 10px; }
+.task-item {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  border: 1px solid var(--border); border-radius: 10px; background: #fff;
+}
+.task-item .task-main { flex: 1; min-width: 0; }
+.task-item .task-title { font-size: 14px; font-weight: 600; word-break: break-all; }
+.task-item .task-meta { font-size: 12px; color: var(--muted); margin-top: 4px; display: flex; gap: 10px; }
+.task-item .task-title.done { text-decoration: line-through; color: var(--muted); }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.badge.low { background: #e8f5e9; color: #2e7d32; }
+.badge.medium { background: #fff8e1; color: #b26a00; }
+.badge.high { background: #fdecea; color: #c62828; }
+.badge.pending { background: #e3f2fd; color: #1565c0; }
+.badge.in_progress { background: #fff8e1; color: #b26a00; }
+.badge.done { background: #e8f5e9; color: #2e7d32; }
+
+.task-actions { display: flex; gap: 6px; }
+.task-actions button {
+  padding: 5px 10px; font-size: 12px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--border); background: none; color: var(--muted);
+}
+.task-actions button:hover { border-color: var(--primary); color: var(--primary); }
+.task-actions .done-btn:hover { border-color: var(--success); color: var(--success); }
+.task-actions .delete-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+.task-edit-row { display: flex; gap: 8px; flex: 1; }
+.task-edit-row input {
+  flex: 1; padding: 8px 10px; border: 1px solid var(--primary); border-radius: 8px; font-size: 14px; outline: none;
+}
+
+.empty-tip { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 0; }

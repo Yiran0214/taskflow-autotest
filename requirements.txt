@@ -1,0 +1,24 @@
+# ===== 被测系统 (TaskFlow) =====
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+PyJWT
+
+# ===== 测试框架 =====
+pytest
+pytest-xdist            # 并行执行
+pytest-rerunfailures    # 失败重试
+pytest-cov              # 覆盖率
+pytest-playwright       # Web UI 测试
+playwright
+requests
+allure-pytest           # Allure 报告
+pytest-html             # HTML 兜底报告
+PyYAML                  # 配置/测试数据解析
+loguru                  # 日志
+faker                   # 测试数据工厂
+locust                  # 性能测试
+
+# ===== 代码质量 =====
+ruff

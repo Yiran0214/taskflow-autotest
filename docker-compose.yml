@@ -1,0 +1,37 @@
+# 一键编排: 被测服务 (TaskFlow) + 自动化测试框架
+# 用法:
+#   docker compose up --build        # 构建并执行全部测试
+#   docker compose run tests python run.py test --type api   # 仅跑 API 用例
+services:
+  app:
+    build: .
+    image: taskflow:latest
+    pull_policy: never          # 镜像仅本地构建, 不从仓库拉取
+    # compose up 复用旧容器时 /tmp 数据会残留, 启动前先删库, 保证每次运行数据全新
+    command: sh -c "rm -f /tmp/taskflow.db && python -m uvicorn app.main:app --host 0.0.0.0 --port 8001"
+    environment:
+      TASKFLOW_DB: sqlite:////tmp/taskflow.db   # 临时数据库: 每次 up 都是全新数据, 用例可重复执行
+      TASKFLOW_SECRET_KEY: taskflow-ci-secret-key-32-bytes-min   # ≥32 字节, 消除 JWT 密钥长度警告
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+    networks:
+      default:
+        aliases:
+          - app.localhost   # *.localhost 被 Chromium 视为回环地址, 豁免 HTTP->HTTPS 自动升级
+
+  tests:
+    image: taskflow:latest
+    pull_policy: never          # 复用 app 服务构建的本地镜像
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      TEST_ENV: ci          # ci 环境: 不重复拉起服务, 指向 app 容器
+      TEST_BASE_URL: http://app.localhost:8001
+    command: python run.py test
+    volumes:
+      # 报告产物挂载到宿主机便于查看
+      - ./reports:/app/reports

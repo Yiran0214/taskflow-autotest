@@ -1,0 +1,44 @@
+# 注册接口数据驱动用例数据 (等价类/边界值设计)
+# 说明: username 3-20 位字母数字下划线; password 6-64 位
+
+valid_cases:
+  - name: "3位最短用户名+6位最短密码"
+    username: "ab1"
+    password: "123456"
+    expected_status: 201
+  - name: "20位最长用户名"
+    username: "a123456789b123456789"
+    password: "abcdef"
+    expected_status: 201
+
+invalid_cases:
+  - name: "用户名过短(2位)"
+    username: "ab"
+    password: "123456"
+    expected_status: 422
+  - name: "用户名过长(21位)"
+    username: "a123456789b123456789c"
+    password: "123456"
+    expected_status: 422
+  - name: "用户名含非法字符(中文)"
+    username: "测试用户1"
+    password: "123456"
+    expected_status: 422
+  - name: "密码过短(5位)"
+    username: "validuser"
+    password: "12345"
+    expected_status: 422
+  - name: "用户名为空"
+    username: ""
+    password: "123456"
+    expected_status: 422
+
+login_cases:
+  - name: "密码错误"
+    username: "__placeholder__"
+    password: "wrong_password"
+    expected_status: 401
+  - name: "用户不存在"
+    username: "__placeholder__"
+    password: "123456"
+    expected_status: 401

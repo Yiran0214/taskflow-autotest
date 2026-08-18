@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow - 我的待办</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand">TaskFlow 待办管理</span>
+    <div class="user-area">
+      <span id="current-username" data-testid="current-username"></span>
+      <button class="logout-btn" id="logout-btn" data-testid="logout-btn">退出登录</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 统计看板 -->
+    <section class="stats-bar">
+      <div class="stat-card"><div class="num" id="stats-total" data-testid="stats-total">0</div><div class="label">全部任务</div></div>
+      <div class="stat-card"><div class="num" id="stats-pending" data-testid="stats-pending">0</div><div class="label">待办</div></div>
+      <div class="stat-card"><div class="num" id="stats-in_progress" data-testid="stats-in_progress">0</div><div class="label">进行中</div></div>
+      <div class="stat-card"><div class="num" id="stats-done" data-testid="stats-done">0</div><div class="label">已完成</div></div>
+      <div class="stat-card"><div class="num" id="stats-completion" data-testid="stats-completion">0%</div><div class="label">完成率</div></div>
+    </section>
+
+    <!-- 新建任务 -->
+    <section class="panel">
+      <h2>新建任务</h2>
+      <div class="add-form">
+        <input class="title-input" id="task-title-input" data-testid="task-title-input" placeholder="任务标题 (必填, 100字以内)" maxlength="100">
+        <select id="task-priority-select" data-testid="task-priority-select">
+          <option value="medium">中优先级</option>
+          <option value="low">低优先级</option>
+          <option value="high">高优先级</option>
+        </select>
+        <input type="date" id="task-due-input" data-testid="task-due-input" title="截止日期">
+        <button class="btn btn-primary" id="task-add-btn" data-testid="task-add-btn">添加任务</button>
+      </div>
+      <p class="error-msg" id="add-error" data-testid="add-error"></p>
+    </section>
+
+    <!-- 任务列表 -->
+    <section class="panel">
+      <div class="filter-tabs">
+        <button id="filter-all" data-testid="filter-all" class="active">全部</button>
+        <button id="filter-pending" data-testid="filter-pending">待办</button>
+        <button id="filter-in_progress" data-testid="filter-in_progress">进行中</button>
+        <button id="filter-done" data-testid="filter-done">已完成</button>
+      </div>
+      <div class="task-list" id="task-list" data-testid="task-list"></div>
+      <p class="empty-tip" id="empty-tip" data-testid="empty-tip" style="display:none">暂无任务, 先添加一个吧</p>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

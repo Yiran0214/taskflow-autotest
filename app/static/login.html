@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow - 登录</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1>TaskFlow</h1>
+      <p class="subtitle">待办任务管理系统</p>
+      <div class="auth-tabs">
+        <button id="tab-login" data-testid="tab-login" class="active">登录</button>
+        <button id="tab-register" data-testid="tab-register">注册</button>
+      </div>
+
+      <!-- 登录表单 -->
+      <div id="form-login">
+        <div class="form-group">
+          <label for="login-username">用户名</label>
+          <input id="login-username" data-testid="login-username" placeholder="请输入用户名" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-password">密码</label>
+          <input id="login-password" data-testid="login-password" type="password" placeholder="请输入密码" autocomplete="current-password">
+        </div>
+        <button id="login-submit" class="btn btn-primary" data-testid="login-submit">登 录</button>
+      </div>
+
+      <!-- 注册表单 -->
+      <div id="form-register" style="display:none">
+        <div class="form-group">
+          <label for="register-username">用户名 (3-20位字母数字下划线)</label>
+          <input id="register-username" data-testid="register-username" placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+          <label for="register-password">密码 (至少6位)</label>
+          <input id="register-password" data-testid="register-password" type="password" placeholder="请输入密码">
+        </div>
+        <button id="register-submit" class="btn btn-primary" data-testid="register-submit">注 册</button>
+      </div>
+
+      <p id="auth-error" class="error-msg" data-testid="auth-error"></p>
+    </div>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

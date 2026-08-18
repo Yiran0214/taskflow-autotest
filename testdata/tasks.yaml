@@ -1,0 +1,71 @@
+# 任务创建接口数据驱动用例数据 (等价类/边界值设计)
+# 约束: title 1-100 必填; priority ∈ {low, medium, high}; due_date 格式 YYYY-MM-DD
+
+title_boundary_cases:
+  - name: "标题最短(1字符)"
+    title: "A"
+    expected_status: 201
+  - name: "标题最长(100字符)"
+    title: "__100chars__"
+    expected_status: 201
+  - name: "标题超长(101字符)"
+    title: "__101chars__"
+    expected_status: 422
+  - name: "标题为空字符串"
+    title: ""
+    expected_status: 422
+  - name: "缺少标题字段"
+    title: null
+    expected_status: 422
+
+priority_cases:
+  - name: "低优先级"
+    payload: {"title": "低优先级任务", "priority": "low"}
+    expected_status: 201
+  - name: "高优先级"
+    payload: {"title": "高优先级任务", "priority": "high"}
+    expected_status: 201
+  - name: "非法优先级"
+    payload: {"title": "非法优先级任务", "priority": "urgent"}
+    expected_status: 422
+
+due_date_cases:
+  - name: "合法截止日期"
+    payload: {"title": "有截止日期任务", "due_date": "2026-12-31"}
+    expected_status: 201
+  - name: "非法日期格式"
+    payload: {"title": "非法日期任务", "due_date": "2026/12/31"}
+    expected_status: 422
+  - name: "不存在的日期(2月30日)"
+    payload: {"title": "不存在日期任务", "due_date": "2026-02-30"}
+    expected_status: 422
+
+status_flow_cases:
+  - name: "待办->进行中"
+    from_status: "pending"
+    to_status: "in_progress"
+    expected_status: 200
+  - name: "进行中->已完成"
+    from_status: "in_progress"
+    to_status: "done"
+    expected_status: 200
+  - name: "待办->已完成(跨状态流转)"
+    from_status: "pending"
+    to_status: "done"
+    expected_status: 200
+  - name: "已完成->待办(违反业务规则)"
+    from_status: "done"
+    to_status: "pending"
+    expected_status: 409
+  - name: "已完成->进行中(违反业务规则)"
+    from_status: "done"
+    to_status: "in_progress"
+    expected_status: 409
+  - name: "非法状态值"
+    from_status: "pending"
+    to_status: "unknown"
+    expected_status: 422
+  - name: "已完成->已完成(幂等)"
+    from_status: "done"
+    to_status: "done"
+    expected_status: 200

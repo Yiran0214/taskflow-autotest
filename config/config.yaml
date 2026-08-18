@@ -1,0 +1,29 @@
+# TaskFlow 自动化测试框架 - 多环境配置
+# 通过环境变量 TEST_ENV 选择环境 (默认 local); 所有键支持环境变量 TEST_<KEY> 覆盖
+
+local:            # 本地环境: 测试框架自动拉起被测服务
+  base_url: http://127.0.0.1:8001
+  use_external_server: false
+  secret_key: taskflow-local-secret-key-32-bytes-min   # 本地自起服务时注入的 JWT 密钥 (供构造过期/伪造 token 用例)
+  api_timeout: 10          # 接口超时(秒)
+  headless: true           # UI 测试无头模式
+  slow_mo: 0               # 操作间隔(ms), 调试时可调大
+  log_level: INFO
+
+test:             # 测试环境: 指向独立部署的被测服务, 框架不再自动拉起
+  base_url: http://127.0.0.1:8002
+  use_external_server: true
+  secret_key: null
+  api_timeout: 10
+  headless: true
+  slow_mo: 0
+  log_level: INFO
+
+ci:               # CI 环境: GitHub Actions 中 docker-compose 编排, 被测服务为 app 容器
+  base_url: http://127.0.0.1:8001
+  use_external_server: true
+  secret_key: null
+  api_timeout: 15
+  headless: true
+  slow_mo: 0
+  log_level: INFO

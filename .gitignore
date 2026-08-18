@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 测试产物
+.pytest_cache/
+reports/
+logs/
+allure-results/
+
+# 被测服务运行数据
+taskflow.db
+*.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 系统
+.DS_Store
+Thumbs.db
+
+# 性能测试产物
+performance_tests/reports/
+locust_stats*.csv

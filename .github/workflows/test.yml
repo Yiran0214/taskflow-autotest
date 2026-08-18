@@ -1,0 +1,163 @@
+# TaskFlow 自动化测试流水线
+# 触发: push / PR 到 main; 每日定时回归 (UTC 10:30 ≈ 北京时间 18:30)
+# 被测服务由测试框架自动拉起 (uvicorn 子进程 + 临时数据库), CI 无需额外编排
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '30 10 * * *'
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------- API 接口自动化 ----------
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run API tests
+        run: python run.py test --type api --reruns 1
+      - name: Upload allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-api
+          path: reports/allure-results
+          retention-days: 7
+
+  # ---------- Web UI 端到端自动化 ----------
+  ui-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+      - name: Run UI tests
+        run: python run.py test --type web --reruns 1
+      - name: Upload allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-ui
+          path: reports/allure-results
+          retention-days: 7
+      # 失败截图 / Trace 只在有用例失败时产生, 一并归档供报告页回放
+      - name: Upload failure screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-failures
+          path: |
+            reports/screenshots
+            reports/traces
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ---------- 汇总生成 Allure 报告并发布到 GitHub Pages ----------
+  # ---------- 汇总生成 Allure 报告并发布到 GitHub Pages ----------
+  report:
+    needs: [api-tests, ui-tests]
+    if: always() && (needs.api-tests.result == 'success' || needs.ui-tests.result == 'success')
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # 删除了 actions/checkout@v4，不再拉取代码
+      - name: Download API allure results
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-api
+          path: results/api
+      - name: Download UI allure results
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-ui
+          path: results/ui
+      - name: Download UI failure artifacts
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-failures
+          path: ui-artifacts
+      - name: Install allure CLI
+        run: |
+          wget -q https://github.com/allure-framework/allure2/releases/download/2.30.0/allure-2.30.0.tgz
+          tar -xzf allure-2.30.0.tgz
+      - name: Generate report
+        run: |
+          # upload/download-artifact v4 会保留 workspace 相对路径, 下载后文件可能嵌套多层;
+          # 统一按文件名归拢到顶层 (Allure 结果均为 UUID 命名, 无冲突)
+          mkdir -p allure-results-merged
+          find results -type f \( -name "*.json" -o -name "*.txt" -o -name "*.png" -o -name "*.zip" \) \
+            -exec cp {} allure-results-merged/ \;
+          ./allure-2.30.0/bin/allure generate allure-results-merged -o allure-report --clean
+          # 失败截图 / Trace 原始文件附加到报告目录, 便于直接下载回放
+          mkdir -p allure-report/screenshots allure-report/traces
+          find ui-artifacts -type d -name screenshots -exec cp -r {}/. allure-report/screenshots/ \;
+          find ui-artifacts -type d -name traces -exec cp -r {}/. allure-report/traces/ \;
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+          retention-days: 14
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # ---------- 性能测试 (手动触发, 节约 CI 时长) ----------
+  performance:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run locust headless
+        run: |
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8001 &
+          sleep 5
+          locust -f performance_tests/locustfile.py --host http://127.0.0.1:8001 \
+            --headless -u 30 -r 10 -t 60s --html reports/locust-report.html
+      - name: Upload perf report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: locust-report
+          path: reports/locust-report.html
+          retention-days: 7
