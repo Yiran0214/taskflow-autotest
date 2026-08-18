@@ -111,7 +111,9 @@ jobs:
         run: |
           # upload/download-artifact v4 会保留 workspace 相对路径, 下载后文件可能嵌套多层;
           # 统一按文件名归拢到顶层 (Allure 结果均为 UUID 命名, 无冲突)
-          mkdir -p allure-results-merged
+          # ui-artifacts 在 UI 用例全绿时不存在 (截图 artifact 不会被上传),
+          # 提前 mkdir 防止 find 对不存在目录报错退出非零
+          mkdir -p allure-results-merged ui-artifacts
           find results -type f \( -name "*.json" -o -name "*.txt" -o -name "*.png" -o -name "*.zip" \) \
             -exec cp {} allure-results-merged/ \;
           ./allure-2.30.0/bin/allure generate allure-results-merged -o allure-report --clean
